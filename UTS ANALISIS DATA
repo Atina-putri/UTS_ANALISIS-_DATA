@@ -1,0 +1,67 @@
+# b.read in your data
+library(readr)
+setwd("D:/UTSANDAT")
+getwd()
+customer_data <- read_csv("Customer-survey-data.csv",col_types = "iccc")
+customer_data
+# c.Check the Packaging
+nrow(customer_data)
+ncol(customer_data)
+str(customer_data)
+
+# d.look at the top and the bottom of your data
+head(customer_data)
+tail(customer_data)
+# e.Check your "n" s
+dim(customer_data)
+library(dplyr)
+filtered_data <- filter(customer_data,Time ==5) %>%  select(DeliveryExperience,Time)
+filtered_data
+dim(filtered_data)
+clean_data <- customer_data[!is.na(customer_data$Time) & !is.na(customer_data$DeliveryExperience), ]
+clean_data
+dim(clean_data)
+
+# f.Validate with at least One external data source
+customer_data$Time <- as.numeric(as.character(customer_data$Time))
+summary(customer_data$Time)
+quantiles_Time <- quantile(customer_data$Time, seq(0,1,0.25), na.rm = TRUE)
+quantiles_Time
+
+# g.make a plot
+library(ggplot2)
+ggplot(customer_data, aes(x = Time)) +geom_histogram(bins = 30, fill = "blue") 
+
+# h.Try the Easy Solution First
+summary(customer_data)
+ggplot(customer_data, aes(Time))+geom_boxplot(colour = "blue")
+
+#i.follow up 
+y = customer_data$DeliveryExperience 
+x = customer_data$Time
+lm(y~x, data = customer_data)
+model = lm(y~x)
+summary(model)
+
+#3. model as expectiations
+library(ggplot2)
+# Assuming customer_data is already loaded and cleaned
+# Convert DeliveryExperience to numeric if it's not already
+customer_data$DeliveryExperience <- as.numeric(as.character(customer_data$DeliveryExperience))
+customer_data$DeliveryExperience
+# Create the histogram with ggplot2
+ggplot(customer_data, aes(x = DeliveryExperience)) +
+  geom_histogram(aes(y = ..density..), 
+                 fill = "green", 
+                 bins = 10, 
+                 color = "gold", 
+                 alpha = 0.7) +
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(customer_data$DeliveryExperience, na.rm = TRUE), 
+                            sd = sd(customer_data$DeliveryExperience, na.rm = TRUE)), 
+                color = "red", 
+                size = 1.5) +
+  labs(title = "Histogram of Delivery Experience", 
+       x = "Delivery Experience Ratings", 
+       y = "Density") +
+  theme_minimal()
